@@ -200,6 +200,21 @@ def apply_transf(matriz, target):
     return aux2
 
 
+def plot_features_imp(importances, x_train):
+    # Sort the feature importances in descending order
+    indices = np.argsort(importances)[::-1]
+    
+    # Create the plot
+    plt.figure(figsize=(10, 5))
+    plt.title('Feature Importances')
+    plt.bar(range(x_train.shape[1]), importances[indices], align='center', color='skyblue')
+    plt.xticks(range(x_train.shape[1]), x_train.columns[indices], rotation=90)
+    plt.xlim([-1, x_train.shape[1]])
+    plt.xlabel('Feature')
+    plt.ylabel('Importance')
+    plt.show()
+
+
 
 
 
