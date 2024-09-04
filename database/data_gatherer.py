@@ -98,9 +98,9 @@ def get_spatial_airblocks_specific_atc_unit_code(connection_dwh: pyodbc.connect,
 
     query_spatial_airblocks_specific_sector = f'''
                                                 select
-                                                    LevelType, ATCUnitCode, ATCType, SectorCode
-                                                    , sp.Polygon.STArea () Polygon_area
-                                                    , LowerBound, UpperBound, Date_From, Date_To, Active
+                                                    LevelType as level_type, ATCUnitCode as atcunit_code, ATCType as atc_type, SectorCode as sector_code
+                                                    , sp.Polygon.STArea () as sector_area
+                                                    , LowerBound, UpperBound, Date_From as date_from, Date_To as date_to, Active as active
                                                 from 
                                                     dwh.dbo.AirspaceStructuresSpatial sp
                                                 where 

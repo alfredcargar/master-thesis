@@ -36,25 +36,25 @@ def merge_operational_capacity_for_specific_sector_to_spatial_structures(
         3. This merge will create the final intervals of validity
     """
 
-    assert "LevelType" in df_airspace_spatial_specific_sector.columns, "LevelType column not found"
-    assert "ATCUnitCode" in df_airspace_spatial_specific_sector.columns, "ATCUnitCode column not found"
-    assert "ATCType" in df_airspace_spatial_specific_sector.columns, "ATCType column not found"
-    assert "SectorCode" in df_airspace_spatial_specific_sector.columns, "SectorCode column not found"
-    assert "Date_From" in df_airspace_spatial_specific_sector.columns and "Date_From" in \
-           df_airspace_operational_specific_sector, "Date_From column not found"
-    assert "Date_To" in df_airspace_spatial_specific_sector.columns and "Date_To" in \
-           df_airspace_operational_specific_sector, "Date_To column not found"
-    assert "Active" in df_airspace_spatial_specific_sector.columns, "Active column not found"
-    assert "Capacity" in df_airspace_operational_specific_sector.columns, "Capacity column not found"
+    assert "level_type" in df_airspace_spatial_specific_sector.columns, "level_type column not found"
+    assert "atcunit_code" in df_airspace_spatial_specific_sector.columns, "atcunit_code column not found"
+    assert "atc_type" in df_airspace_spatial_specific_sector.columns, "atc_type column not found"
+    assert "sector_code" in df_airspace_spatial_specific_sector.columns, "sector_code column not found"
+    assert "date_from" in df_airspace_spatial_specific_sector.columns and "date_from" in \
+           df_airspace_operational_specific_sector, "date_from column not found"
+    assert "date_to" in df_airspace_spatial_specific_sector.columns and "date_to" in \
+           df_airspace_operational_specific_sector, "date_to column not found"
+    assert "active" in df_airspace_spatial_specific_sector.columns, "active column not found"
+    assert "capacity" in df_airspace_operational_specific_sector.columns, "capacity column not found"
 
     df_dataset = pd.DataFrame()  # Initialize output DataFrame
 
     # Shared information #
     new_row = {
-        'LevelType': df_airspace_spatial_specific_sector.iloc[0]['LevelType'],
-        'ATCUnitCode': df_airspace_spatial_specific_sector.iloc[0]['ATCUnitCode'],
-        'SectorCode': df_airspace_spatial_specific_sector.iloc[0]['SectorCode'],
-        'ATCType': df_airspace_spatial_specific_sector.iloc[0]['ATCType'],
+        'level_type': df_airspace_spatial_specific_sector.iloc[0]['level_type'],
+        'atcunit_code': df_airspace_spatial_specific_sector.iloc[0]['atcunit_code'],
+        'sector_code': df_airspace_spatial_specific_sector.iloc[0]['sector_code'],
+        'atc_type': df_airspace_spatial_specific_sector.iloc[0]['atc_type'],
     }
 
     for index_spatial, row_spatial in df_airspace_spatial_specific_sector.iterrows():
@@ -66,75 +66,75 @@ def merge_operational_capacity_for_specific_sector_to_spatial_structures(
 
         # Exact same periods #
         df_info_operational_period_equal = df_airspace_operational_specific_sector[
-            (df_airspace_operational_specific_sector['Date_From'] == row_spatial['Date_From']) &
-            (df_airspace_operational_specific_sector['Date_To'] == row_spatial['Date_To'])]
+            (df_airspace_operational_specific_sector['date_from'] == row_spatial['date_from']) &
+            (df_airspace_operational_specific_sector['date_to'] == row_spatial['date_to'])]
 
         if len(df_info_operational_period_equal) != 0:
             if debug_mode:
                 print("===== EQUAL")
                 print(df_info_operational_period_equal)
 
-            new_row['Polygon_area'] = row_spatial['Polygon_area']
-            new_row['Perimeter'] = row_spatial['Perimeter']
-            new_row['NumberOfVertices'] = row_spatial['NumberOfVertices']
-            new_row['Centroid_Latitude'] = row_spatial['Centroid_Latitude']
-            new_row['Centroid_Longitude'] = row_spatial['Centroid_Longitude']
-            new_row['Capacity'] = df_info_operational_period_equal['Capacity'].values[0]
-            new_row['Date_From'] = row_spatial['Date_From']
-            new_row['Date_To'] = row_spatial['Date_To']
+            new_row['sector_area'] = row_spatial['sector_area']
+            new_row['sector_perimeter'] = row_spatial['sector_perimeter']
+            new_row['num_vertices'] = row_spatial['num_vertices']
+            new_row['centroid_lat'] = row_spatial['centroid_lat']
+            new_row['centroid_lon'] = row_spatial['centroid_lon']
+            new_row['capacity'] = df_info_operational_period_equal['capacity'].values[0]
+            new_row['date_from'] = row_spatial['date_from']
+            new_row['date_to'] = row_spatial['date_to']
 
             df_dataset = pd.concat([df_dataset, pd.DataFrame([new_row])], ignore_index=True)
 
         # Active interval #
-        elif row_spatial['Active']:
+        elif row_spatial['active']:
             df_info_operational_period_active = df_airspace_operational_specific_sector[
-                (df_airspace_operational_specific_sector['Date_To'] > row_spatial['Date_From'])]
+                (df_airspace_operational_specific_sector['date_to'] > row_spatial['date_from'])]
 
             if debug_mode:
                 print("===== ACTIVE")
                 print(df_info_operational_period_active)
 
-            date_from = row_spatial['Date_From']
+            date_from = row_spatial['date_from']
             for index_operational, row_operational in df_info_operational_period_active.iterrows():
-                new_row['Polygon_area'] = row_spatial['Polygon_area']
-                new_row['Perimeter'] = row_spatial['Perimeter']
-                new_row['NumberOfVertices'] = row_spatial['NumberOfVertices']
-                new_row['Centroid_Latitude'] = row_spatial['Centroid_Latitude']
-                new_row['Centroid_Longitude'] = row_spatial['Centroid_Longitude']
-                new_row['Capacity'] = row_operational['Capacity']
-                new_row['Date_From'] = date_from
-                new_row['Date_To'] = row_operational['Date_To']
+                new_row['sector_area'] = row_spatial['sector_area']
+                new_row['sector_perimeter'] = row_spatial['sector_perimeter']
+                new_row['num_vertices'] = row_spatial['num_vertices']
+                new_row['centroid_lat'] = row_spatial['centroid_lat']
+                new_row['centroid_lon'] = row_spatial['centroid_lon']
+                new_row['capacity'] = row_operational['capacity']
+                new_row['date_from'] = date_from
+                new_row['date_to'] = row_operational['date_to']
 
                 df_dataset = pd.concat([df_dataset, pd.DataFrame([new_row])], ignore_index=True)
 
                 # The date from of the next iteration is the date to of the previous one
-                if not row_operational['Active']:
-                    date_from = row_operational['Date_To']
+                if not row_operational['active']:
+                    date_from = row_operational['date_to']
         else:
             # Left overlap #
             df_info_operational_period_left = df_airspace_operational_specific_sector[
-                (df_airspace_operational_specific_sector['Date_From'] < row_spatial['Date_From']) &
-                (df_airspace_operational_specific_sector['Date_To'] > row_spatial['Date_From']) &
-                (df_airspace_operational_specific_sector['Date_To'] <= row_spatial['Date_To'])]
+                (df_airspace_operational_specific_sector['date_from'] < row_spatial['date_from']) &
+                (df_airspace_operational_specific_sector['date_to'] > row_spatial['date_from']) &
+                (df_airspace_operational_specific_sector['date_to'] <= row_spatial['date_to'])]
             df_info_operational_period_left['overlap'] = 'left'
 
             # Complete overlap #
             df_info_operational_period_complete = df_airspace_operational_specific_sector[
-                (df_airspace_operational_specific_sector['Date_From'] < row_spatial['Date_From']) &
-                (df_airspace_operational_specific_sector['Date_To'] > row_spatial['Date_To'])]
+                (df_airspace_operational_specific_sector['date_from'] < row_spatial['date_from']) &
+                (df_airspace_operational_specific_sector['date_to'] > row_spatial['date_to'])]
             df_info_operational_period_complete['overlap'] = 'complete'
 
             # Inside #
             df_info_operational_period_inside = df_airspace_operational_specific_sector[
-                (df_airspace_operational_specific_sector['Date_From'] >= row_spatial['Date_From']) &
-                (df_airspace_operational_specific_sector['Date_To'] < row_spatial['Date_To'])]
+                (df_airspace_operational_specific_sector['date_from'] >= row_spatial['date_from']) &
+                (df_airspace_operational_specific_sector['date_to'] < row_spatial['date_to'])]
             df_info_operational_period_inside['overlap'] = 'inside'
 
             # Right overlap #
             df_info_operational_period_right = df_airspace_operational_specific_sector[
-                (df_airspace_operational_specific_sector['Date_From'] >= row_spatial['Date_From']) &
-                (df_airspace_operational_specific_sector['Date_From'] < row_spatial['Date_To']) &
-                (df_airspace_operational_specific_sector['Date_To'] >= row_spatial['Date_To'])]
+                (df_airspace_operational_specific_sector['date_from'] >= row_spatial['date_from']) &
+                (df_airspace_operational_specific_sector['date_from'] < row_spatial['date_to']) &
+                (df_airspace_operational_specific_sector['date_to'] >= row_spatial['date_to'])]
             df_info_operational_period_right['overlap'] = 'right'
 
             df_info_operational_period = pd.concat([df_info_operational_period_left,
@@ -144,28 +144,28 @@ def merge_operational_capacity_for_specific_sector_to_spatial_structures(
 
             if debug_mode:
                 print("===== INTERACTION")
-                print(df_info_operational_period[['Capacity', 'Date_From', 'Date_To', 'overlap']])
+                print(df_info_operational_period[['capacity', 'date_from', 'date_to', 'overlap']])
 
             for index_operation, row_operational in df_info_operational_period.iterrows():
-                new_row['Polygon_area'] = row_spatial['Polygon_area']
-                new_row['Perimeter'] = row_spatial['Perimeter']
-                new_row['NumberOfVertices'] = row_spatial['NumberOfVertices']
-                new_row['Centroid_Latitude'] = row_spatial['Centroid_Latitude']
-                new_row['Centroid_Longitude'] = row_spatial['Centroid_Longitude']
-                new_row['Capacity'] = row_operational['Capacity']
+                new_row['sector_area'] = row_spatial['sector_area']
+                new_row['sector_perimeter'] = row_spatial['sector_perimeter']
+                new_row['num_vertices'] = row_spatial['num_vertices']
+                new_row['centroid_lat'] = row_spatial['centroid_lat']
+                new_row['centroid_lon'] = row_spatial['centroid_lon']
+                new_row['capacity'] = row_operational['capacity']
 
                 if row_operational['overlap'] == 'complete':
-                    new_row['Date_From'] = row_spatial['Date_From']
-                    new_row['Date_To'] = row_spatial['Date_To']
+                    new_row['date_from'] = row_spatial['date_from']
+                    new_row['date_to'] = row_spatial['date_to']
                 elif row_operational['overlap'] == 'left':
-                    new_row['Date_From'] = row_spatial['Date_From']
-                    new_row['Date_To'] = row_operational['Date_To']
+                    new_row['date_from'] = row_spatial['date_from']
+                    new_row['date_to'] = row_operational['date_to']
                 elif row_operational['overlap'] == 'inside':
-                    new_row['Date_From'] = row_operational['Date_From']
-                    new_row['Date_To'] = row_operational['Date_To']
+                    new_row['date_from'] = row_operational['date_from']
+                    new_row['date_to'] = row_operational['date_to']
                 elif row_operational['overlap'] == 'right':
-                    new_row['Date_From'] = row_operational['Date_From']
-                    new_row['Date_To'] = row_spatial['Date_To']
+                    new_row['date_from'] = row_operational['date_from']
+                    new_row['date_to'] = row_spatial['date_to']
 
                 df_dataset = pd.concat([df_dataset, pd.DataFrame([new_row])], ignore_index=True)
 
@@ -192,27 +192,27 @@ def volume_airblocks_composing_sector_average(date_from: datetime.date, date_to:
             the volume is approximated using the FIRST set of airblocks in DWH used to compose the sector.
     """
 
-    assert "Date_From" in df_spatial_airblocks_specific_sector.columns and "Date_From" in \
+    assert "date_from" in df_spatial_airblocks_specific_sector.columns and "date_from" in \
            df_spatial_airblocks_specific_sector, "Date_From column not found"
-    assert "Date_To" in df_spatial_airblocks_specific_sector.columns and "Date_To" in \
+    assert "date_to" in df_spatial_airblocks_specific_sector.columns and "date_to" in \
            df_spatial_airblocks_specific_sector, "Date_To column not found"
     assert "LowerBound" in df_spatial_airblocks_specific_sector.columns, "LowerBound column not found"
     assert "UpperBound" in df_spatial_airblocks_specific_sector.columns, "UpperBound column not found"
-    assert "Polygon_area" in df_spatial_airblocks_specific_sector.columns, "Polygon_area column not found"
+    assert "sector_area" in df_spatial_airblocks_specific_sector.columns, "sector_area column not found"
 
     df_airblocks_interval = get_validity_periods_for_date_from_date_to(date_from, date_to,
                                                                        df_spatial_airblocks_specific_sector,
                                                                        debug_mode=debug_mode)
 
-    unique_date_from = np.unique(df_airblocks_interval['Date_From'].values)
+    unique_date_from = np.unique(df_airblocks_interval['date_from'].values)
 
     # Compute the average volume of the airblocks composing the sector.
     #  It is possible to have multiple valid periods of airblocks for the requested [date_from date_to].
     possible_volumes = []
     number_of_airblocks = []
     for date_from in unique_date_from:
-        df_airblocks = df_airblocks_interval[df_airblocks_interval['Date_From'] == date_from]
-        df_airblocks.loc[:, 'volume_airblock'] = df_airblocks.loc[:, 'Polygon_area'] * \
+        df_airblocks = df_airblocks_interval[df_airblocks_interval['date_from'] == date_from]
+        df_airblocks.loc[:, 'volume_airblock'] = df_airblocks.loc[:, 'sector_area'] * \
                                                  (df_airblocks.loc[:, 'UpperBound'] - df_airblocks.loc[:, 'LowerBound'])
 
         volume = float(np.sum(df_airblocks['volume_airblock'].values))
@@ -251,13 +251,13 @@ def volume_airblocks_composing_sector_average_first_valid_period(date_from: date
             the volume is approximated using the FIRST set of airblocks in DWH used to compose the sector.
     """
 
-    assert "Date_From" in df_spatial_airblocks_specific_sector.columns and "Date_From" in \
+    assert "date_from" in df_spatial_airblocks_specific_sector.columns and "date_from" in \
            df_spatial_airblocks_specific_sector, "Date_From column not found"
-    assert "Date_To" in df_spatial_airblocks_specific_sector.columns and "Date_To" in \
+    assert "date_to" in df_spatial_airblocks_specific_sector.columns and "date_to" in \
            df_spatial_airblocks_specific_sector, "Date_To column not found"
     assert "LowerBound" in df_spatial_airblocks_specific_sector.columns, "LowerBound column not found"
     assert "UpperBound" in df_spatial_airblocks_specific_sector.columns, "UpperBound column not found"
-    assert "Polygon_area" in df_spatial_airblocks_specific_sector.columns, "Polygon_area column not found"
+    assert "sector_area" in df_spatial_airblocks_specific_sector.columns, "sector_area column not found"
 
     df_airblocks_interval = df_spatial_airblocks_specific_sector[
         (date_from >= df_spatial_airblocks_specific_sector['Date_From']) &
@@ -265,7 +265,7 @@ def volume_airblocks_composing_sector_average_first_valid_period(date_from: date
 
     assert len(df_airblocks_interval) != 0, f"No airblocks found for the period {date_from} - {date_to}"
 
-    df_airblocks_interval.loc[:, 'Area_airblock'] = df_airblocks_interval.loc[:, 'Polygon_area'] * \
+    df_airblocks_interval.loc[:, 'Area_airblock'] = df_airblocks_interval.loc[:, 'sector_area'] * \
                                                     (df_airblocks_interval.loc[:,
                                                      'UpperBound'] - df_airblocks_interval.loc[:, 'LowerBound'])
 
@@ -298,9 +298,9 @@ def check_if_volume_with_steps(date_from: datetime.date, date_to: datetime.date,
         1 if the airblocks composing the volume have steps, 0 otherwise
     """
 
-    assert "Date_From" in df_spatial_airblocks_specific_sector.columns and "Date_From" in \
+    assert "date_from" in df_spatial_airblocks_specific_sector.columns and "date_from" in \
            df_spatial_airblocks_specific_sector, "Date_From column not found"
-    assert "Date_To" in df_spatial_airblocks_specific_sector.columns and "Date_To" in \
+    assert "date_to" in df_spatial_airblocks_specific_sector.columns and "date_to" in \
            df_spatial_airblocks_specific_sector, "Date_To column not found"
     assert "LowerBound" in df_spatial_airblocks_specific_sector.columns, "LowerBound column not found"
     assert "UpperBound" in df_spatial_airblocks_specific_sector.columns, "UpperBound column not found"
@@ -337,9 +337,9 @@ def lowest_highest_bound_specific_sector(date_from: datetime.date, date_to: date
         The lowest and highest bound for a specific sector
     """
 
-    assert "Date_From" in df_spatial_airblocks_specific_sector.columns and "Date_From" in \
+    assert "date_from" in df_spatial_airblocks_specific_sector.columns and "date_from" in \
            df_spatial_airblocks_specific_sector, "Date_From column not found"
-    assert "Date_To" in df_spatial_airblocks_specific_sector.columns and "Date_To" in \
+    assert "date_to" in df_spatial_airblocks_specific_sector.columns and "date_to" in \
            df_spatial_airblocks_specific_sector, "Date_To column not found"
     assert "LowerBound" in df_spatial_airblocks_specific_sector.columns, "LowerBound column not found"
     assert "UpperBound" in df_spatial_airblocks_specific_sector.columns, "UpperBound column not found"
@@ -375,23 +375,18 @@ def get_validity_periods_for_date_from_date_to(date_from: datetime.date, date_to
         3. Airblocks active used from 2018-04-26 to 2022-03-24
     """
 
-    assert "Date_From" in df_spatial_airblocks_specific_sector.columns and "Date_From" in \
-           df_spatial_airblocks_specific_sector, "Date_From column not found"
-    assert "Date_To" in df_spatial_airblocks_specific_sector.columns and "Date_To" in \
-           df_spatial_airblocks_specific_sector, "Date_To column not found"
-
     if debug_mode:
         print("----------------------------")
         print(f"date_from: {date_from} || date_to: {date_to}")
 
     # Exact same periods #
     df_airblocks_interval_period_equal = df_spatial_airblocks_specific_sector[
-        (df_spatial_airblocks_specific_sector['Date_From'] == date_from) &
-        (df_spatial_airblocks_specific_sector['Date_To'] == date_to)]
+        (df_spatial_airblocks_specific_sector['date_from'] == date_from) &
+        (df_spatial_airblocks_specific_sector['date_to'] == date_to)]
     if debug_mode:
         print("===== EQUAL")
         print(df_airblocks_interval_period_equal[
-                  ['ATCUnitCode', 'SectorCode', 'LowerBound', 'UpperBound', 'Date_From', 'Date_To']])
+                  ['atcunit_code', 'sector_code', 'LowerBound', 'UpperBound', 'date_from', 'date_to']])
     if len(df_airblocks_interval_period_equal) != 0:
         df_airblocks_interval_period_equal['overlap'] = 'equal'
         return df_airblocks_interval_period_equal
@@ -399,7 +394,7 @@ def get_validity_periods_for_date_from_date_to(date_from: datetime.date, date_to
     # Active #
     elif date_to == datetime.date(9999, 12, 31):
         df_airblocks_interval_period_active = df_spatial_airblocks_specific_sector[
-            (df_spatial_airblocks_specific_sector['Date_To'] > date_from)]
+            (df_spatial_airblocks_specific_sector['date_to'] > date_from)]
         if debug_mode:
             print("===== ACTIVE")
             print(df_airblocks_interval_period_active[
@@ -412,28 +407,28 @@ def get_validity_periods_for_date_from_date_to(date_from: datetime.date, date_to
     else:
         # Left overlap #
         df_airblocks_interval_period_left = df_spatial_airblocks_specific_sector[
-            (df_spatial_airblocks_specific_sector['Date_From'] < date_from) &
-            (df_spatial_airblocks_specific_sector['Date_To'] > date_from) &
-            (df_spatial_airblocks_specific_sector['Date_To'] <= date_to)]
+            (df_spatial_airblocks_specific_sector['date_from'] < date_from) &
+            (df_spatial_airblocks_specific_sector['date_to'] > date_from) &
+            (df_spatial_airblocks_specific_sector['date_to'] <= date_to)]
         df_airblocks_interval_period_left['overlap'] = 'left'
 
         # Complete overlap #
         df_airblocks_interval_period_complete = df_spatial_airblocks_specific_sector[
-            (df_spatial_airblocks_specific_sector['Date_From'] < date_from) &
-            (df_spatial_airblocks_specific_sector['Date_To'] > date_to)]
+            (df_spatial_airblocks_specific_sector['date_from'] < date_from) &
+            (df_spatial_airblocks_specific_sector['date_to'] > date_to)]
         df_airblocks_interval_period_complete['overlap'] = 'complete'
 
         # Inside #
         df_airblocks_interval_period_inside = df_spatial_airblocks_specific_sector[
-            (df_spatial_airblocks_specific_sector['Date_From'] >= date_from) &
-            (df_spatial_airblocks_specific_sector['Date_To'] <= date_to)]
+            (df_spatial_airblocks_specific_sector['date_from'] >= date_from) &
+            (df_spatial_airblocks_specific_sector['date_to'] <= date_to)]
         df_airblocks_interval_period_inside['overlap'] = 'inside'
 
         # Right overlap #
         df_airblocks_interval_period_right = df_spatial_airblocks_specific_sector[
-            (df_spatial_airblocks_specific_sector['Date_From'] >= date_from) &
-            (df_spatial_airblocks_specific_sector['Date_From'] < date_to) &
-            (df_spatial_airblocks_specific_sector['Date_To'] > date_to)]
+            (df_spatial_airblocks_specific_sector['date_from'] >= date_from) &
+            (df_spatial_airblocks_specific_sector['date_from'] < date_to) &
+            (df_spatial_airblocks_specific_sector['date_to'] > date_to)]
         df_airblocks_interval_period_right['overlap'] = 'right'
 
         df_airblocks_interval_period = pd.concat([df_airblocks_interval_period_left,

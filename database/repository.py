@@ -10,13 +10,13 @@ import pyodbc
 def select_sectors_spatial(connection_dwh: pyodbc.connect) -> pd.DataFrame:
     query = f'''
             SELECT
-            sp.LevelType, sp.ATCUnitCode, sp.ATCType, sp.SectorCode, 
-            sp.Date_From, sp.Date_To, sp.Active,
-            sp.Polygon.STArea() Polygon_area,
-            sp.Polygon.STLength() AS Perimeter,
-            sp.Polygon.STNumPoints() AS NumberOfVertices,
-            sp.Polygon.STPointN(sp.Polygon.STNumPoints() / 2).Lat AS Centroid_Latitude,
-            sp.Polygon.STPointN(sp.Polygon.STNumPoints() / 2).Long AS Centroid_Longitude
+            sp.LevelType as level_type, sp.ATCUnitCode as atcunit_code, sp.ATCType as atc_type, sp.SectorCode as sector_code, 
+            sp.Date_From as date_from, sp.Date_To as date_to, sp.Active as active,
+            sp.Polygon.STArea() as sector_area,
+            sp.Polygon.STLength() as sector_perimeter,
+            sp.Polygon.STNumPoints() as num_vertices,
+            sp.Polygon.STPointN(sp.Polygon.STNumPoints() / 2).Lat as centroid_lat,
+            sp.Polygon.STPointN(sp.Polygon.STNumPoints() / 2).Long as centroid_lon
             FROM dwh.dbo.AirspaceStructuresSpatial sp 
             WHERE sp.LevelType = 'Sector';
             '''
@@ -26,8 +26,8 @@ def select_sectors_spatial(connection_dwh: pyodbc.connect) -> pd.DataFrame:
 def select_sectors_operational(connection_dwh: pyodbc.connect) -> pd.DataFrame:
     query = f'''
             select
-            op.LevelType, op.ATCUnitCode, op.ATCType, op.SectorCode,
-            op.Capacity, op.Date_From, op.Date_To, op.Active
+            op.LevelType as level_type, op.ATCUnitCode as atcunit_code, op.ATCType as atc_type, op.SectorCode as sector_code,
+            op.Capacity as capacity, op.Date_From as date_from, op.Date_To as date_to, op.Active as active
             from dwh.dbo.AirspaceStructuresOperational op
             where op.LevelType='Sector'
             '''
