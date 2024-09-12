@@ -1,2 +1,7 @@
 /utils/configuration.py
 /utils/properties.py
+/utils/__pycache__
+/utils/.ipynb_checkpoints
+/notebooks/.ipynb_checkpoints
+/database/.ipynb_checkpoints
+/database/__pycache__
